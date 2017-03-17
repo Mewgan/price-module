@@ -1,0 +1,15 @@
+{
+  "name": "price-module",
+  "title": "Price",
+  "username": "Mewgan",
+  "remote": "https://github.com/Mewgan/price-module",
+  "download-url": "https://github.com/Mewgan/price-module/archive/master.zip",
+  "description": "Price module",
+  "author": "S.Sumugan",
+  "version": "0.1",
+
+  "models": [
+
+  ]
+
+}
