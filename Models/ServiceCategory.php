@@ -2,6 +2,7 @@
 
 namespace Jet\Modules\Price\Models;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use JetFire\Db\Model;
 use Doctrine\ORM\Mapping;
 
@@ -38,6 +39,10 @@ class ServiceCategory extends Model implements \JsonSerializable
      */
     protected $website;
     /**
+     * @OneToMany(targetEntity="Service", mappedBy="category")
+     */
+    protected $services;
+    /**
      * @Column(type="datetime")
      */
     protected $created_at;
@@ -45,6 +50,13 @@ class ServiceCategory extends Model implements \JsonSerializable
      * @Column(type="datetime", nullable=true)
      */
     protected $updated_at;
+
+    /**
+     * TeamRole constructor.
+     */
+    public function __construct() {
+        $this->services = new ArrayCollection();
+    }
 
     /**
      * @return mixed
@@ -124,6 +136,30 @@ class ServiceCategory extends Model implements \JsonSerializable
     public function setWebsite($website)
     {
         $this->website = $website;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getServices()
+    {
+        return $this->services;
+    }
+
+    /**
+     * @param mixed $services
+     */
+    public function setServices($services)
+    {
+        $this->services = $services;
+    }
+
+    /**
+     * @param Service $service
+     */
+    public function addService(Service $service)
+    {
+        $this->services[] = $service;
     }
 
     /**

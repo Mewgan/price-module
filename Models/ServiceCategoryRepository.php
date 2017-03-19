@@ -2,14 +2,14 @@
 
 namespace Jet\Modules\Price\Models;
 
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Jet\Models\AppRepository;
 
 /**
  * Class ServiceCategoryRepository
  * @package Jet\Modules\Price\Models
  */
-class ServiceCategoryRepository extends EntityRepository
+class ServiceCategoryRepository extends AppRepository
 {
 
 
@@ -67,11 +67,10 @@ class ServiceCategoryRepository extends EntityRepository
             $query->andWhere($query->expr()->isNull('w.id'));
         }
 
-        if (isset($params['options']) && isset($params['options']['parent_exclude']) && isset($params['options']['parent_exclude']['service_categories']) && !empty($params['options']['parent_exclude']['service_categories'])) {
-            $query->andWhere($query->expr()->notIn('c.id', ':exclude_ids'))
-                ->setParameter('exclude_ids', $params['options']['parent_exclude']['service_categories']);
+        if (isset($params['options'])){
+            $query = $this->excludeData($query, $params['options'], 'service_categories', 'c');
         }
-
+        
         return $query;
     }
 

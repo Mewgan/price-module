@@ -5,6 +5,7 @@ namespace Jet\Modules\Price\Controllers;
 use Cocur\Slugify\Slugify;
 use Jet\AdminBlock\Controllers\AdminController;
 use Jet\Models\Website;
+use Jet\Modules\Price\Models\Service;
 use Jet\Modules\Price\Models\ServiceCategory;
 use Jet\Services\Auth;
 use JetFire\Http\Request;
@@ -57,13 +58,13 @@ class AdminServiceCategoryController extends AdminController
             $position = $request->get('position');
 
             if (ServiceCategory::where('name', $name)->where('website', $website)->count() == 0) {
-                $role = new ServiceCategory();
-                $role->setName($name);
-                $role->setSlug($slugify->slugify($name));
-                $role->setPosition($position);
-                $role->setWebsite(Website::findOneById($website));
-                if (ServiceCategory::watchAndSave($role))
-                    return ['status' => 'success', 'message' => 'La catégorie a bien été créée', 'resource' => $role];
+                $service = new ServiceCategory();
+                $service->setName($name);
+                $service->setSlug($slugify->slugify($name));
+                $service->setPosition($position);
+                $service->setWebsite(Website::findOneById($website));
+                if (ServiceCategory::watchAndSave($service))
+                    return ['status' => 'success', 'message' => 'La catégorie a bien été créée', 'resource' => $service];
                 return ['status' => 'error', 'message' => 'La catégorie n\'a pas été créée'];
             }
             return ['status' => 'error', 'message' => 'La catégorie existe déjà'];
@@ -108,7 +109,7 @@ class AdminServiceCategoryController extends AdminController
                 $website->setData($data);
                 Website::watch($website);
 
-                $role = new ServiceCategory();
+                $category = new ServiceCategory();
                 $replace = true;
             }
 
@@ -120,12 +121,12 @@ class AdminServiceCategoryController extends AdminController
             if (ServiceCategory::watchAndSave($category)) {
                 if ($replace) {
                     $this->reassignService($old_category, $category, $website);
-                    $website = $role->getWebsite();
-                    $data = $this->replaceData($website->getData(), 'team_roles', $id, $role->getId());
+                    $website = $category->getWebsite();
+                    $data = $this->replaceData($website->getData(), 'service_categories', $id, $category->getId());
                     $website->setData($data);
                     Website::watchAndSave($website);
                 }
-                return ['status' => 'success', 'message' => 'Le rôle a bien été mis à jour'];
+                return ['status' => 'success', 'message' => 'La catégorie a bien été mis à jour'];
             } else
                 return ['status' => 'error', 'message' => 'Erreur lors de la mise à jour'];
         }
@@ -141,31 +142,28 @@ class AdminServiceCategoryController extends AdminController
     {
         $data = $website->getData();
         $this->getWebsite($website);
-        $teams = $old_role->getTeams();
-        /** @var Team $member */
-        foreach ($teams as $member) {
-            if (in_array($member->getWebsite()->getId(), $this->websites)) {
-                /** @var Team $member */
-                if ($member->getWebsite() != $website) {
-                    /** @var Team $new_team */
-                    $new_member = new Team;
-                    $new_member->setFullName($member->getFullName());
-                    $new_member->setPhoto($member->getPhoto());
-                    $new_member->setDescription($member->getDescription());
-                    $new_member->setGender($member->getGender());
-                    $new_member->setOrder($member->getOrder());
-                    $new_member->removeRole($old_role);
-                    $new_member->addRole($role);
-                    $new_member->setWebsite($website);
+        $services = $old_category->getServices();
+        /** @var Service $service */
+        foreach ($services as $service) {
+            if (in_array($service->getWebsite()->getId(), $this->websites)) {
+                /** @var Service $service */
+                if ($service->getWebsite() != $website) {
+                    /** @var Service $new_service */
+                    $new_service = new Service();
+                    $new_service->setTitle($service->getTitle());
+                    $new_service->setDescription($service->getDescription());
+                    $new_service->setPosition($service->getPosition());
+                    $new_service->setPrice($service->getPrice());
+                    $new_service->setCategory($category);
+                    $new_service->setWebsite($website);
 
-                    $data = $this->excludeData($data, 'teams', $member->getId());
-                    $data = $this->replaceData($data, 'teams', $member->getId(), $new_member->getId());
+                    $data = $this->excludeData($data, 'services', $service->getId());
+                    $data = $this->replaceData($data, 'services', $service->getId(), $new_service->getId());
 
-                    Team::watch($new_member);
+                    Service::watch($new_service);
                 } else {
-                    $member->removeRole($old_role);
-                    $member->addRole($role);
-                    Team::watch($member);
+                    $service->setCategory($category);
+                    Service::watch($service);
                 }
             }
         }
@@ -188,29 +186,29 @@ class AdminServiceCategoryController extends AdminController
             if (is_null($website)) return ['status' => 'error', 'message' => 'Impossible de trouver le site web'];
 
             if (!$this->isWebsiteOwner($auth, $website->getId()))
-                return ['status' => 'error', 'message' => 'Vous n\'avez pas les permissions pour supprimer ces rôles'];
+                return ['status' => 'error', 'message' => 'Vous n\'avez pas les permissions pour supprimer ces catégories'];
 
             $data = $website->getData();
 
-            $roles = TeamRole::repo()->findById($request->get('ids'));
+            $categories = ServiceCategory::repo()->findById($request->get('ids'));
             $ids = [];
 
-            foreach ($roles as $role) {
-                $data = $this->removeData($data, 'team_roles', $role['id']);
-                if ($role['website']['id'] != $website->getId()) {
-                    $data = $this->excludeData($data, 'team_roles', $role['id']);
+            foreach ($categories as $category) {
+                $data = $this->removeData($data, 'service_categories', $category['id']);
+                if ($category['website']['id'] != $website->getId()) {
+                    $data = $this->excludeData($data, 'service_categories', $category['id']);
                 } else
-                    $ids[] = $role['id'];
+                    $ids[] = $category['id'];
             }
 
             $website->setData($data);
             Website::watchAndSave($website);
 
-            return (TeamRole::destroy($ids))
-                ? ['status' => 'success', 'message' => 'Les rôles ont bien été supprimés']
+            return (ServiceCategory::destroy($ids))
+                ? ['status' => 'success', 'message' => 'Les catégories ont bien été supprimées']
                 : ['status' => 'error', 'message' => 'Erreur lors de la suppression'];
         }
-        return ['status' => 'error', 'message' => 'Les rôles n\'ont pas pu être supprimés'];
+        return ['status' => 'error', 'message' => 'Les catégories n\'ont pas pu être supprimées'];
     }
 
 }

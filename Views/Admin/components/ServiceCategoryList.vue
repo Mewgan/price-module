@@ -7,13 +7,13 @@
 <template>
     <div class="team-role-list">
 
-        <div class="card">
+        <div class="team-role-container">
             <div class="card-head style-primary">
                 <header><i class="fa fa-fw fa-tag"></i> Catégories</header>
             </div>
-            <div class="card-body">
-                <ul class="list list-accordion panel-group" id="service-accordion" data-sortable="true">
-                    <li v-for="category in categories" class="tile">
+            <div class="list-results list-results-underlined">
+                <ul class="list panel-group" data-sortable="true">
+                    <li v-for="category in categories" class="tile card panel" :data-id="service.id">
                         <a @click="selectCategory(category)" class="tile-content ink-reaction">
                             <div class="tile-text">{{ category.name }}</div>
                         </a>
@@ -113,7 +113,7 @@
             return {
                 category: {
                     name: 'Aucune catégorie choisie',
-                    position: 0,
+                    position: 0
                 }
             }
         },
@@ -130,7 +130,21 @@
                 this.$emit('selectCategory', category);
             },
             updateOrCreate(){
-
+                if (this.category.id !== undefined) {
+                    this.update({
+                        api: service_category_api.update + this.category.id + '/' + this.website_id,
+                        value: this.category
+                    })
+                } else {
+                    this.create({
+                        api: service_category_api.create + this.website_id,
+                        value: this.category
+                    }).then((response) => {
+                        if (response.data.resource !== undefined){
+                            this.categories.push(response.data.resource);
+                        }
+                    })
+                }
             },
             deleteCategory(){
                 if (this.category.id !== undefined) {
