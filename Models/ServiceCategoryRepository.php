@@ -25,9 +25,15 @@ class ServiceCategoryRepository extends AppRepository
             ->from('Jet\Modules\Price\Models\ServiceCategory', 'c')
             ->leftJoin('c.website', 'w');
 
+        if(isset($params['service_in_category']) && $params['service_in_category'] == true){
+            $query->addSelect('s')
+                ->leftJoin('c.services', 's')
+                ->orderBy('s.position', 'ASC');
+        }
+
         $query = $this->getQueryWithParams($query, $params);
 
-        $query->orderBy('c.id', 'DESC');
+        $query->addOrderBy('c.position', 'ASC');
 
         return $query->getQuery()->getArrayResult();
     }
@@ -42,7 +48,7 @@ class ServiceCategoryRepository extends AppRepository
             ->select('partial c.{id}')
             ->addSelect('partial w.{id}')
             ->from('Jet\Modules\Price\Models\ServiceCategory', 'c')
-            ->leftJoin('t.website', 'w');
+            ->leftJoin('c.website', 'w');
         return $query->where($query->expr()->in('c.id', ':ids'))
             ->setParameter('ids', $ids)
             ->getQuery()->getArrayResult();

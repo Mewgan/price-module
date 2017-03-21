@@ -21,7 +21,7 @@ class ServiceRepository extends AppRepository
         $query = Service::queryBuilder();
 
         $query->select('s')
-            ->addSelect('partial c.{id,name}')
+            ->addSelect('partial c.{id,name,slug,updated_at}')
             ->from('Jet\Modules\Price\Models\Service', 's')
             ->leftJoin('s.category', 'c')
             ->leftJoin('s.website', 'w');

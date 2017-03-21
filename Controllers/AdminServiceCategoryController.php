@@ -8,7 +8,7 @@ use Jet\Models\Website;
 use Jet\Modules\Price\Models\Service;
 use Jet\Modules\Price\Models\ServiceCategory;
 use Jet\Services\Auth;
-use JetFire\Http\Request;
+use JetFire\Framework\System\Request;
 
 /**
  * Class AdminServiceCategoryController
@@ -48,11 +48,11 @@ class AdminServiceCategoryController extends AdminController
             if (!$this->isWebsiteOwner($auth, $website))
                 return ['status' => 'error', 'message' => 'Vous n\'avez pas les permissions pour créer une catégorie'];
 
-            if(!$request->has('name'))
+            if (!$request->has('name'))
                 return ['status' => 'error', 'message' => 'Aucune donnée reçue'];
 
-            if(!$request->has('position'))
-                return ['status' => 'error', 'message' => 'Veuillez définir l\'order d\'affichage de la catégorie'];
+            if (!$request->has('position'))
+                return ['status' => 'error', 'message' => 'Veuillez définir l\'ordre d\'affichage de la catégorie'];
 
             $name = $request->get('name');
             $position = $request->get('position');
@@ -169,6 +169,43 @@ class AdminServiceCategoryController extends AdminController
         }
         $website->setData($data);
         Website::watch($website);
+    }
+
+    /**
+     * @param Request $request
+     * @param Auth $auth
+     * @param $website
+     * @return array|bool
+     */
+    public function updatePosition(Request $request, Auth $auth, $website)
+    {
+        if ($request->method() == 'PUT' && $request->has('categories')) {
+
+            if (!$this->isWebsiteOwner($auth, $website))
+                return ['status' => 'error', 'message' => 'Vous n\'avez pas les permissions pour mettre à jour un rôle'];
+
+            $categories = $request->get('categories');
+            foreach ($categories as $category) {
+                $response = $request->validate([
+                    'id|position' => 'required|numeric'
+                ], [
+                    'required' => 'L\'id et la position de la catégorie sont requises'
+                ], $category);
+                if (is_array($response)) return $response;
+
+                /** @var ServiceCategory $category */
+                $service_cat = ServiceCategory::findOneById($category['id']);
+                if (is_null($service_cat))
+                    return ['status' => 'error', 'message' => 'Impossible de trouver la catégorie'];
+                $service_cat->setPosition((int)$category['position']);
+                ServiceCategory::watch($service_cat);
+            }
+
+            return (ServiceCategory::save())
+                ? ['status' => 'success', 'message' => 'Les catégories ont bien été mis à jour']
+                : ['status' => 'error', 'message' => 'Erreur lors de la mise à jour'];
+        }
+        return ['status' => 'error', 'message' => 'Requête non autorisée'];
     }
 
     /**

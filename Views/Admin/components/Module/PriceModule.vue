@@ -10,12 +10,13 @@
         margin-left: 0;
         padding: inherit;
     }
+
 </style>
 
 <template>
     <div class="edit-price">
         <form class="form">
-            <div v-if="auth.status.level < 4">
+            <div>
                 <h5 class="module-title">Information :</h5>
                 <div class="row">
                     <div class="col-md-6">
@@ -53,9 +54,55 @@
                     <label :for="'content-class-' + line">Class</label>
                 </div>
             </div>
-            <div>
-                <div :id="'grid-editor-' + line"></div>
+            <h5 class="module-title">Choix du template :</h5>
+            <template-editor :id="line" :templates="templates" :template="content.template"
+                             label="Template du contenu"></template-editor>
+            <h5 class="module-title">Configuration avancé :</h5>
+            <div class="row">
+                <div class="col-md-4 center-align">
+                    <div class="form-group">
+                        <p>Lister les services dans catégorie</p>
+                        <div class="switch">
+                            <label>
+                                Non
+                                <input v-model="content_data.service_in_category" type="checkbox">
+                                <span class="lever"></span>
+                                Oui
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 center-align">
+                    <div class="form-group">
+                        <p>Lister les services</p>
+                        <div class="switch">
+                            <label>
+                                Non
+                                <input v-model="content_data.service" type="checkbox">
+                                <span class="lever"></span>
+                                Oui
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 center-align">
+                    <div class="form-group">
+                        <p>Lister les catégories</p>
+                        <div class="switch">
+                            <label>
+                                Non
+                                <input v-model="content_data.category" type="checkbox">
+                                <span class="lever"></span>
+                                Oui
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <select2 v-if="categories.length > 0" @updateValue="updateCategories"
+                     :contents="categories" :id="'categories-' + line" val_index="id" index="name"
+                     label="Choisir les catégories à afficher ou laisser vide pour tout afficher"
+                     :val="content_data.categories"></select2>
         </form>
 
         <div class="modal-footer">
@@ -69,19 +116,23 @@
 
 <script type="text/babel">
 
-    import '@modules/GridEditor/Resources/public/css/grideditor/grideditor.css'
-    import '@modules/GridEditor/Resources/public/css/grideditor/grideditor-font-awesome.css'
+    import {mapActions} from 'vuex'
+    import {template_api} from '@front/api'
+    import {service_category_api} from '../../api'
 
-    import '@modules/GridEditor/Resources/public/js/jquery-ui.min'
-    import '@modules/GridEditor/Resources/public/js/tinymce/jquery.tinymce.min'
-    import '@modules/GridEditor/Resources/public/js/grideditor/jquery.grideditor'
-
-    import Media from '@front/components/Helper/Media.vue'
-    import Colorpicker from '@front/components/Helper/Colorpicker.vue'
-    import {mapGetters, mapActions} from 'vuex'
+    import module_mixin from '@front/mixin/module'
 
     export default{
         name: 'price',
+        components: {
+            TemplateEditor: resolve => {
+                require(['@front/components/Helper/TemplateEditor.vue'], resolve)
+            },
+            Select2: resolve => {
+                require(['@front/components/Helper/Select2.vue'], resolve)
+            }
+        },
+        mixins: [module_mixin],
         props: {
             line: {
                 default: 'default'
@@ -100,9 +151,14 @@
         data(){
             return {
                 website_id: this.$route.params.website_id,
+                templates: [],
+                categories: [],
                 content_data: {
                     class: '',
-                    content: ''
+                    service: true,
+                    category: true,
+                    service_in_category: false,
+                    categories: []
                 }
             }
         },
@@ -114,25 +170,24 @@
                 deep: true
             }
         },
-        computed: {
-            ...mapGetters(['auth', 'system'])
-        },
         methods: {
-            ...mapActions(['read']),
+            ...mapActions(['read', 'setResponse']),
+            updateCategories(val){
+                this.content.data.categories = val;
+            }
+        },
+        created () {
+            this.read({api: template_api.get_website_content_layouts + this.website}).then((response) => {
+                this.templates = response.data;
+            });
+            this.read({api: service_category_api.all + this.website}).then((response) => {
+                if (response.data.resource !== undefined)
+                    this.categories = response.data.resource;
+            });
         },
         mounted(){
-            this.$nextTick(function () {
-                let o = this;
-                if (this.content.data.content !== undefined)this.content_data = this.content.data;
-                this.loadEditor();
-                $('#mediaLibrarygrid-editor-media-' + o.line).on('show.bs.modal', () => {
-                    $('.mce-panel.mce-window').hide();
-                });
-
-                $('#mediaLibrarygrid-editor-media-' + o.line).on('hide.bs.modal', () => {
-                    $('.mce-panel.mce-window').show();
-                });
-            })
+            if (this.content.data.categories !== undefined && this.content.data.categories instanceof Array)
+                this.content_data = Object.assign({}, this.content_data, this.content.data);
         }
     }
 </script>

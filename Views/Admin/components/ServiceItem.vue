@@ -15,54 +15,37 @@
         margin-right: 15px;
         cursor: move;
     }
-    .service-item header span{
-        margin-left: 10px;
+    .service-item .edit-service-title, .service-item .edit-price-title{
+        display: inline-block;
+        width: inherit;
     }
 </style>
 
 <template>
     <li class="service-item tile card panel" :data-id="service.id">
         <div class="list-header">
-            <div class="card-head col-md-11 collapsed" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id">
+            <div class="card-head col-md-11 collapsed">
                 <header>
-                    <i class="fa drag-arrows fa-arrows"></i>
-                    <span> {{service.title}}</span>
+                    <i class="fa drag-arrows fa-arrows mr10"></i>
+                    <span class="text-info"> Titre * : </span>
+                    <input type="text" class="form-control edit-service-title" v-model="service.title">
+                    <span class="text-info"> Prix * : </span>
+                    <input type="text" class="form-control edit-price-title" v-model="service.price">
                 </header>
                 <div class="tools">
-                    <a class="btn btn-info"><i class="fa fa-pencil"></i></a>
+                    <a class="btn btn-info" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
                 </div>
             </div>
             <div class="delete-container col-md-1">
-                <a @click="deleteService" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                <a data-toggle="modal" :data-target="'#deleteServiceModal' + id" class="btn btn-danger"><i class="fa fa-trash"></i></a>
             </div>
         </div>
+
         <div :id="'accordion-' + id" class="accordion collapse">
             <div class="col-md-12">
                 <form class="form">
                     <table class="table table-banded no-margin">
                         <tbody>
-                        <tr>
-                            <td class="col-md-3">
-                                <h4>Nom du service *</h4>
-                            </td>
-                            <td class="col-md-9 field-value">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="service-title" v-model="service.title">
-                                    <label for="service-title">Titre</label>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-md-3">
-                                <h4>Prix</h4>
-                            </td>
-                            <td class="col-md-9 field-value">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="service-price" v-model="service.price">
-                                    <label for="service-price">Prix</label>
-                                </div>
-                            </td>
-                        </tr>
                         <tr>
                             <td class="col-md-3">
                                 <h4>Description</h4>
@@ -79,6 +62,27 @@
                     </table>
                 </form>
             </div>
+        </div>
+
+        <div class="modal fade" :id="'deleteServiceModal' + id" tabindex="-1" role="dialog"
+             aria-labelledby="simpleModalLabel" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title" :id="'deleteServiceModalLabel' + id">Suppression</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Êtes-vous sûr de vouloir supprimer ce tarif ?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="modal-btn btn btn-default" data-dismiss="modal">Non</button>
+                        <button type="button" class="modal-btn btn btn-primary" data-dismiss="modal" @click="deleteService">
+                            Oui
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
         </div>
     </li>
 </template>
@@ -123,7 +127,7 @@
                 this.service.description = val;
             },
             deleteService(){
-                if(this.service.id !== undefined){
+                if(this.service.id !== undefined && (typeof this.service.id === 'number' || (typeof this.service.id === 'string' && this.service.id.substring(0,6) !== 'create'))){
                     this.destroy({
                         api: service_api.destroy + this.website_id,
                         ids: [this.service.id]

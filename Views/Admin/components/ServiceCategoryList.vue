@@ -1,29 +1,38 @@
 <style>
-    .team-role-list{
+    .price-category-list{
         overflow: auto;
+    }
+    .price-category-list .tile .drag-arrows{
+        cursor: move;
     }
 </style>
 
 <template>
-    <div class="team-role-list">
+    <div class="price-category-list">
 
-        <div class="team-role-container">
+        <div class="price-category-container">
             <div class="card-head style-primary">
                 <header><i class="fa fa-fw fa-tag"></i> Catégories</header>
+                <div v-show="categories.length > 0" class="tools">
+                    <a @click="updatePosition" class="btn btn-default"><i class="fa fa-save"></i> Enregistrer</a>
+                </div>
             </div>
             <div class="list-results list-results-underlined">
-                <ul class="list panel-group" data-sortable="true">
-                    <li v-for="category in categories" class="tile card panel" :data-id="service.id">
-                        <a @click="selectCategory(category)" class="tile-content ink-reaction">
-                            <div class="tile-text">{{ category.name }}</div>
-                        </a>
-                        <a @click="selectRole(role)" data-toggle="modal" data-target="#editServiceCategoryModal"
+                <ul class="list panel-group" id="price-list-sortable" data-sortable="true">
+                    <li v-for="cat in categories" class="tile card panel mt10" :data-id="cat.id">
+                        <div class="tile-content ink-reaction">
+                            <div class="tile-text"><i class="fa drag-arrows fa-arrows mr10"></i> {{ cat.name }}</div>
+                        </div>
+                        <a @click="editCategory(cat)" data-toggle="modal" data-target="#editServiceCategoryModal"
                            class="btn btn-flat">
                             <i class="fa fa-pencil"></i>
                         </a>
-                        <a @click="selectRole(role)" data-toggle="modal" data-target="#deleteServiceCategoryModal"
+                        <a @click="editCategory(cat)" data-toggle="modal" data-target="#deleteServiceCategoryModal"
                            class="btn btn-flat ink-reaction">
                             <i class="fa fa-trash"></i>
+                        </a>
+                        <a @click="selectCategory(cat)" class="btn btn-flat ink-reaction">
+                            <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
                 </ul>
@@ -118,9 +127,13 @@
             }
         },
         methods: {
+            ...mapActions([
+                'create', 'update', 'destroy'
+            ]),
             clearCategory(){
                 this.category =  {
-                    name: ''
+                    name: '',
+                    position: this.categories.length
                 };
             },
             editCategory(category){
@@ -146,10 +159,18 @@
                     })
                 }
             },
+            updatePosition(){
+                this.update({
+                    api: service_category_api.update_position + this.website_id,
+                    value: {
+                        categories: this.categories
+                    }
+                })
+            },
             deleteCategory(){
                 if (this.category.id !== undefined) {
                     this.destroy({
-                        api: price_category_api.destroy + this.website_id,
+                        api: service_category_api.destroy + this.website_id,
                         ids: [this.category.id]
                     }).then((response) => {
                         if (response.data.status == 'success'){
@@ -159,6 +180,27 @@
                     })
                 }
             }
+        },
+        mounted(){
+            let o = this;
+            $('#price-list-sortable').sortable({
+                placeholder: "ui-state-highlight",
+                delay: 100,
+                start: function (e, ui) {
+                    ui.placeholder.height(ui.item.outerHeight() - 1);
+                },
+                stop: function (event, ui) {
+                    let new_postions = [];
+                    $('#' + ui.item[0].parentNode.id + ' > li').each((index, li) => {
+                        let id = $(li).attr('data-id');
+                        let i = o.categories.findIndex((i) => i.id == id);
+                        new_postions[i] = index;
+                    });
+                    new_postions.forEach((element, index) => {
+                        o.categories[index].position = element;
+                    })
+                }
+            });
         }
     }
 </script>

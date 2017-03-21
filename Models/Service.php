@@ -39,7 +39,7 @@ class Service extends Model implements \JsonSerializable
     protected $description;
     /**
      * @ManyToOne(targetEntity="ServiceCategory", inversedBy="services")
-     * @JoinColumn(name="website_id", referencedColumnName="id", onDelete="CASCADE")
+     * @JoinColumn(name="category_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $category;
     /**
