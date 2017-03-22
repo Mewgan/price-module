@@ -25,11 +25,11 @@
                 <strong><i class="fa fa-info-circle"></i> Gérer vos tarifs</strong><br/>
             </div>
 
-            <div class="col-lg-4 col-md-12 col-sm-12 mb10">
+            <div class="col-lg-4 col-md-12 mb10">
                 <service-category-list :website_id="website_id" :categories="categories" @selectCategory="selectCategory"></service-category-list>
             </div>
 
-            <div class="col-lg-8 col-md-12 col-sm-12">
+            <div class="col-lg-8 col-md-12">
                 <service-list :website_id="website_id" :category="category"></service-list>
             </div><!--end .section-body -->
 

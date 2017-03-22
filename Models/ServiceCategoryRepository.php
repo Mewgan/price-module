@@ -29,6 +29,8 @@ class ServiceCategoryRepository extends AppRepository
             $query->addSelect('s')
                 ->leftJoin('c.services', 's')
                 ->orderBy('s.position', 'ASC');
+
+            $query = $this->excludeData($query, $params['options'], 'services', 's');
         }
 
         $query = $this->getQueryWithParams($query, $params);
