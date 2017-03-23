@@ -106,10 +106,7 @@
                     }
                 }).then((response) => {
                     if (response.data.resource !== undefined) {
-                        response.data.resource.forEach((service) => {
-                            let index = this.services.findIndex((i) => i.position == service.position);
-                            this.services[index]['id'] = service.id;
-                        })
+                        this.services = response.data.resource;
                     }
                 });
             }

@@ -25,17 +25,17 @@ class ServiceCategoryRepository extends AppRepository
             ->from('Jet\Modules\Price\Models\ServiceCategory', 'c')
             ->leftJoin('c.website', 'w');
 
+        $query = $this->getQueryWithParams($query, $params);
+
+        $query->orderBy('c.position', 'ASC');
+
         if(isset($params['service_in_category']) && $params['service_in_category'] == true){
             $query->addSelect('s')
                 ->leftJoin('c.services', 's')
-                ->orderBy('s.position', 'ASC');
+                ->addOrderBy('s.position', 'ASC');
 
             $query = $this->excludeData($query, $params['options'], 'services', 's');
         }
-
-        $query = $this->getQueryWithParams($query, $params);
-
-        $query->addOrderBy('c.position', 'ASC');
 
         return $query->getQuery()->getArrayResult();
     }
