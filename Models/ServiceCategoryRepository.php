@@ -29,15 +29,9 @@ class ServiceCategoryRepository extends AppRepository
 
         $query->orderBy('c.position', 'ASC');
 
-        if(isset($params['service_in_category']) && $params['service_in_category'] == true){
-            $query->addSelect('s')
-                ->leftJoin('c.services', 's')
-                ->addOrderBy('s.position', 'ASC');
-
-            $query = $this->excludeData($query, $params['options'], 'services', 's');
-        }
-
-        return $query->getQuery()->getArrayResult();
+        return (isset($params['reassign']) && $params['reassign'] == false)
+            ? $query->getQuery()->getArrayResult()
+            : $this->reassignServices($query->getQuery()->getArrayResult(), $params);
     }
 
     /**
@@ -54,6 +48,28 @@ class ServiceCategoryRepository extends AppRepository
         return $query->where($query->expr()->in('c.id', ':ids'))
             ->setParameter('ids', $ids)
             ->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @param array $data
+     * @param array $params
+     * @return array
+     */
+    private function reassignServices($data = [], $params = [])
+    {
+        if (isset($params['websites']) && isset($params['service_in_category']) && $params['service_in_category'] == true) {
+            $categories = ServiceCategory::repo()->listAll(['websites' => $params['websites'], 'service_in_category' => true, 'options' => [], 'reassign' => false]);
+            $replace_ids = isset($params['options']['parent_replace']['service_categories']) ? array_flip($params['options']['parent_replace']['service_categories']) : [];
+            foreach ($data as $i => $category) {
+                if (isset($replace_ids[$category['id']])) {
+                    $index = findIndex($categories, 'id', $replace_ids[$category['id']]);
+                    if ($index !== false) {
+                        $data[$i]['services'] = $categories[$index]['services'];
+                    }
+                }
+            }
+        }
+        return $data;
     }
 
     /**
@@ -75,10 +91,18 @@ class ServiceCategoryRepository extends AppRepository
             $query->andWhere($query->expr()->isNull('w.id'));
         }
 
-        if (isset($params['options'])){
+        if (isset($params['options'])) {
             $query = $this->excludeData($query, $params['options'], 'service_categories', 'c');
         }
-        
+
+        if (isset($params['service_in_category']) && $params['service_in_category'] == true) {
+            $query->addSelect('s')
+                ->leftJoin('c.services', 's')
+                ->addOrderBy('s.position', 'ASC');
+
+            $query = $this->excludeData($query, $params['options'], 'services', 's');
+        }
+
         return $query;
     }
 

@@ -102,8 +102,6 @@ class AdminServiceCategoryController extends AdminController
             $category = ServiceCategory::findOneById($id);
             if (is_null($category)) return ['status' => 'error', 'message' => 'Impossible de trouver la catégorie'];
 
-            $old_category = $category;
-
             if (is_null($category->getWebsite()) || $category->getWebsite()->getId() != $website->getId()) {
                 $data = $this->excludeData($website->getData(), 'service_categories', $category->getId());
                 $website->setData($data);
@@ -120,7 +118,6 @@ class AdminServiceCategoryController extends AdminController
 
             if (ServiceCategory::watchAndSave($category)) {
                 if ($replace) {
-                    $this->reassignService($old_category, $category, $website);
                     $website = $category->getWebsite();
                     $data = $this->replaceData($website->getData(), 'service_categories', $id, $category->getId());
                     $website->setData($data);
@@ -131,44 +128,6 @@ class AdminServiceCategoryController extends AdminController
                 return ['status' => 'error', 'message' => 'Erreur lors de la mise à jour'];
         }
         return ['status' => 'error', 'message' => 'Requête non autorisée'];
-    }
-
-    /**
-     * @param ServiceCategory $old_category
-     * @param ServiceCategory $category
-     * @param Website $website
-     */
-    private function reassignService(ServiceCategory $old_category, ServiceCategory $category, Website $website)
-    {
-        $data = $website->getData();
-        $this->getWebsite($website);
-        $services = $old_category->getServices();
-        /** @var Service $service */
-        foreach ($services as $service) {
-            if (in_array($service->getWebsite()->getId(), $this->websites)) {
-                /** @var Service $service */
-                if ($service->getWebsite() != $website) {
-                    /** @var Service $new_service */
-                    $new_service = new Service();
-                    $new_service->setTitle($service->getTitle());
-                    $new_service->setDescription($service->getDescription());
-                    $new_service->setPosition($service->getPosition());
-                    $new_service->setPrice($service->getPrice());
-                    $new_service->setCategory($category);
-                    $new_service->setWebsite($website);
-
-                    $data = $this->excludeData($data, 'services', $service->getId());
-                    $data = $this->replaceData($data, 'services', $service->getId(), $new_service->getId());
-
-                    Service::watch($new_service);
-                } else {
-                    $service->setCategory($category);
-                    Service::watch($service);
-                }
-            }
-        }
-        $website->setData($data);
-        Website::watch($website);
     }
 
     /**

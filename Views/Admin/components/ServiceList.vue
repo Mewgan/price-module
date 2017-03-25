@@ -27,7 +27,7 @@
                 <div class="list-results list-results-underlined">
                     <ul class="list list-accordion panel-group" id="service-accordion" data-sortable="true">
                         <service-item v-for="(service, key) in services" :key="service.id"
-                                      v-if="service.category.id == category.id" :id="service.id"
+                                      v-show="service.category.id == category.id" :id="service.id"
                                       :service="service" @serviceDeleted="deleteService" :website_id="website_id"></service-item>
                     </ul>
                     <em class="text-caption pull-left mt10">(*) Champs obligatoires</em>
