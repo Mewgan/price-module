@@ -29,11 +29,12 @@ class FrontServiceController extends MainController
                 'websites' => $this->websites,
                 'options' => $this->getWebsiteData($website),
                 'categories' => (isset($data['categories']) && is_array($data['categories'])) ? $data['categories'] : [],
-                'service_in_category' => (isset($data['service_in_category']) && ((string)$data['service_in_category'] == 'true' || $data['service_in_category'] == true)) ? true : false
+                'service_in_category' => (isset($data['service_in_category']) && ((string)$data['service_in_category'] == 'true' || $data['service_in_category'] === true)) ? true : false
             ];
 
-            $services = (isset($data['service']) && ((string)$data['service'] == 'false' || $data['service'] == false)) ? [] : Service::repo()->listAll($params);
-            $service_categories = (isset($data['category']) && ((string)$data['category'] == 'false' || $data['category'] == false)) ? [] : ServiceCategory::repo()->listAll($params);
+            $services = (isset($data['service']) && ((string)$data['service'] == 'false' || $data['service'] === false)) ? [] : Service::repo()->listAll($params);
+            $service_categories = (isset($data['category']) && ((string)$data['category'] == 'false' || $data['category'] === false)) ? [] : ServiceCategory::repo()->listAll($params);
+            
             return $this->_renderContent($content->getTemplate(), 'src/Modules/Price/Views/', compact('services', 'service_categories'));
         }
         return null;

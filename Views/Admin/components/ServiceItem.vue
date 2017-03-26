@@ -24,19 +24,17 @@
 <template>
     <li class="service-item tile card panel" :data-id="service.id">
         <div class="list-header">
-            <div class="card-head col-md-11 collapsed">
-                <header>
+            <div class="card-head col-md-10 collapsed">
+                <header class="pl0 pr0">
                     <i class="fa drag-arrows fa-arrows mr10"></i>
-                    <span class="text-info"> Titre * : </span>
+                    <span class="text-info">Titre * : </span>
                     <input type="text" class="form-control edit-service-title" v-model="service.title">
-                    <span class="text-info"> Prix * : </span>
+                    <span class="text-info">Prix * : </span>
                     <input type="text" class="form-control edit-price-title" v-model="service.price">
                 </header>
-                <div class="tools">
-                    <a class="btn btn-info" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
-                </div>
             </div>
-            <div class="delete-container col-md-1">
+            <div class="delete-container col-md-2">
+                <a class="btn btn-info" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
                 <a data-toggle="modal" :data-target="'#deleteServiceModal' + id" class="btn btn-danger"><i class="fa fa-trash"></i></a>
             </div>
         </div>
@@ -116,7 +114,7 @@
                         price: '',
                         description: '',
                         position: 0,
-                        category: {},
+                        category: {}
                     }
                 }
             }

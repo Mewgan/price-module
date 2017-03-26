@@ -26,11 +26,11 @@
             </div>
 
             <div class="col-lg-4 col-md-12 mb10">
-                <service-category-list :website_id="website_id" :categories="categories" @selectCategory="selectCategory"></service-category-list>
+                <service-category-list :website_id="website_id" :categories="categories" @reloadServices="reload_services = !reload_services" @selectCategory="selectCategory"></service-category-list>
             </div>
 
             <div class="col-lg-8 col-md-12">
-                <service-list :website_id="website_id" :category="category"></service-list>
+                <service-list :website_id="website_id" :reload_services="reload_services" :category="category"></service-list>
             </div><!--end .section-body -->
 
         </div>
@@ -55,11 +55,12 @@
             },
             ServiceCategoryList: resolve => {
                 require(['./ServiceCategoryList.vue'], resolve)
-            },
+            }
         },
         data () {
             return {
                 website_id: this.$route.params.website_id,
+                reload_services: false,
                 categories: [],
                 category: {
                     name: ''

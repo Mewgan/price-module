@@ -69,6 +69,10 @@
             website_id: {
                 required: true
             },
+            reload_services: {
+                type: Boolean,
+                default: false
+            },
             category: {
                 default: () => {
                     return {
@@ -82,8 +86,21 @@
                 services: []
             }
         },
+        watch: {
+            reload_services(val, oldVal){
+                if(val != oldVal){
+                    this.loadServices();
+                }
+            }
+        },
         methods: {
             ...mapActions(['read', 'update']),
+            loadServices(){
+                this.read({api: service_api.all + this.website_id}).then((response) => {
+                    if(response.data.resource != undefined)
+                        this.services = response.data.resource;
+                })
+            },
             addService(){
                 this.services.push({
                     id: 'create-' + this.services.length,
@@ -112,10 +129,7 @@
             }
         },
         created () {
-            this.read({api: service_api.all + this.website_id}).then((response) => {
-                if(response.data.resource != undefined)
-                    this.services = response.data.resource;
-            })
+            this.loadServices();
         },
         mounted () {
             let o = this;

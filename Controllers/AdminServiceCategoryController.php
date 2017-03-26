@@ -58,13 +58,13 @@ class AdminServiceCategoryController extends AdminController
             $position = $request->get('position');
 
             if (ServiceCategory::where('name', $name)->where('website', $website)->count() == 0) {
-                $service = new ServiceCategory();
-                $service->setName($name);
-                $service->setSlug($slugify->slugify($name));
-                $service->setPosition($position);
-                $service->setWebsite(Website::findOneById($website));
-                if (ServiceCategory::watchAndSave($service))
-                    return ['status' => 'success', 'message' => 'La catégorie a bien été créée', 'resource' => $service];
+                $category = new ServiceCategory();
+                $category->setName($name);
+                $category->setSlug($slugify->slugify($name));
+                $category->setPosition($position);
+                $category->setWebsite(Website::findOneById($website));
+                if (ServiceCategory::watchAndSave($category))
+                    return ['status' => 'success', 'message' => 'La catégorie a bien été créée', 'resource' => $category];
                 return ['status' => 'error', 'message' => 'La catégorie n\'a pas été créée'];
             }
             return ['status' => 'error', 'message' => 'La catégorie existe déjà'];
@@ -100,6 +100,7 @@ class AdminServiceCategoryController extends AdminController
 
             /** @var ServiceCategory $category */
             $category = ServiceCategory::findOneById($id);
+            $old_category = $category;
             if (is_null($category)) return ['status' => 'error', 'message' => 'Impossible de trouver la catégorie'];
 
             if (is_null($category->getWebsite()) || $category->getWebsite()->getId() != $website->getId()) {
@@ -116,6 +117,16 @@ class AdminServiceCategoryController extends AdminController
             $category->setSlug($slugify->slugify($name));
             $category->setWebsite($website);
 
+            $data = $website->getData();
+            if($old_category->getId() != $category->getId() && isset($data['parent_exclude']['services']) && !empty($data['parent_exclude']['services'])){
+                foreach ($old_category->getServices() as $service){
+                    if($service->getWebsite() == $website) {
+                        $service->setCategory($category);
+                        Service::watch($service);
+                    }
+                }
+            }
+
             if (ServiceCategory::watchAndSave($category)) {
                 if ($replace) {
                     $website = $category->getWebsite();
@@ -123,7 +134,7 @@ class AdminServiceCategoryController extends AdminController
                     $website->setData($data);
                     Website::watchAndSave($website);
                 }
-                return ['status' => 'success', 'message' => 'La catégorie a bien été mis à jour'];
+                return ['status' => 'success', 'message' => 'La catégorie a bien été mis à jour', 'resource' => $category];
             } else
                 return ['status' => 'error', 'message' => 'Erreur lors de la mise à jour'];
         }

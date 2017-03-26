@@ -24,11 +24,11 @@ class ServiceRepository extends AppRepository
             ->addSelect('partial c.{id,name,slug,updated_at}')
             ->from('Jet\Modules\Price\Models\Service', 's')
             ->leftJoin('s.category', 'c')
-            ->leftJoin('s.website', 'w');
+            ->leftJoin('s.website', 'w')
+            ->addOrderBy('c.position', 'ASC')
+            ->addOrderBy('s.position', 'ASC');
 
         $query = $this->getQueryWithParams($query, $params);
-
-        $query->orderBy('s.position', 'ASC');
 
         return $this->reassignCategories($query->getQuery()->getArrayResult(), $params);
     }
@@ -56,9 +56,22 @@ class ServiceRepository extends AppRepository
      */
     private function reassignCategories($data = [], $params = [])
     {
-        $categories = ServiceCategory::repo()->listAll($params);
+        $categories = ServiceCategory::repo()->listAll(['websites' => $params['websites']]);
         $exclude_ids = isset($params['options']['parent_exclude']['service_categories']) ? array_flip($params['options']['parent_exclude']['service_categories']) : [];
+        $in_cat = null;
+        if (isset($params['categories']) && is_array($params['categories']) && !empty($params['categories'])) {
+            foreach ($params['categories'] as $k => $cat) {
+                if (isset($exclude_ids[$cat])) {
+                    unset($params['categories'][$k]);
+                }
+                if (isset($params['options']['parent_replace']['service_categories'][$cat])) {
+                    $params['categories'][$k] = $params['options']['parent_replace']['service_categories'][$cat];
+                }
+            }
+            $in_cat = array_flip($params['categories']);
+        }
         foreach ($data as $i => $service) {
+            $remove_item = true;
             if (isset($service['category']['id'])) {
                 if (isset($exclude_ids[$service['category']['id']])) {
                     unset($data[$i]['category']);
@@ -69,6 +82,13 @@ class ServiceRepository extends AppRepository
                         $data[$i]['category'] = $categories[$index];
                     }
                 }
+                if (is_null($in_cat) || (isset($data[$i]['category']['id']) && isset($in_cat[$data[$i]['category']['id']]))) {
+                    $remove_item = false;
+                }
+            }
+
+            if($remove_item === true){
+                unset($data[$i]);
             }
         }
         return $data;
@@ -94,11 +114,6 @@ class ServiceRepository extends AppRepository
 
         if (isset($params['options'])) {
             $query = $this->excludeData($query, $params['options'], 'services');
-        }
-
-        if (isset($params['categories']) && !empty($params['categories'])) {
-            $query->andWhere($query->expr()->in('c.id', ':categories'))
-                ->setParameter('categories', $params['categories']);
         }
 
         return $query;

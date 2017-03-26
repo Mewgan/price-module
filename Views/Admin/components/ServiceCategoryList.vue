@@ -147,6 +147,15 @@
                     this.update({
                         api: service_category_api.update + this.category.id + '/' + this.website_id,
                         value: this.category
+                    }).then((response) => {
+                        if(response.data.resource !== undefined){
+                            let index = this.categories.findIndex((i) => i.id == this.category.id);
+                            this.categories[index] = response.data.resource;
+                            if(response.data.resource.id != this.category.id) {
+                                this.category = response.data.resource;
+                                this.$emit('reloadServices');
+                            }
+                        }
                     })
                 } else {
                     this.create({
