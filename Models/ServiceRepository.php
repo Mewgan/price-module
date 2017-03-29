@@ -71,7 +71,6 @@ class ServiceRepository extends AppRepository
             $in_cat = array_flip($params['categories']);
         }
         foreach ($data as $i => $service) {
-            $remove_item = true;
             if (isset($service['category']['id'])) {
                 if (isset($exclude_ids[$service['category']['id']])) {
                     unset($data[$i]['category']);
@@ -82,13 +81,9 @@ class ServiceRepository extends AppRepository
                         $data[$i]['category'] = $categories[$index];
                     }
                 }
-                if (is_null($in_cat) || (isset($data[$i]['category']['id']) && isset($in_cat[$data[$i]['category']['id']]))) {
-                    $remove_item = false;
+                if (!is_null($in_cat) && isset($data[$i]['category']['id']) && !isset($in_cat[$data[$i]['category']['id']])) {
+                    unset($data[$i]);
                 }
-            }
-
-            if($remove_item === true){
-                unset($data[$i]);
             }
         }
         return $data;
