@@ -1,9 +1,9 @@
 <style>
-    .team-list .list-accordion .tile-text{
+    .service-list .list-accordion .tile-text{
         display: inline-block;
         width: 95%;
     }
-    .team-list .list-accordion .tile-content{
+    .service-list .list-accordion .tile-content{
         display: inline-block;
         padding: 16px;
         vertical-align: top;
@@ -12,9 +12,9 @@
 </style>
 
 <template>
-    <div class="team-list">
+    <div class="service-list">
 
-        <div class="team-list-container">
+        <div class="service-list-container">
             <div class="card-head style-primary">
                 <header>Liste des tarifs pour la catégorie : {{ category.name }}</header>
                 <div v-show="category.id != null" class="tools">

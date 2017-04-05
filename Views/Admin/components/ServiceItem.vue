@@ -34,7 +34,7 @@
                 </header>
             </div>
             <div class="delete-container col-md-2">
-                <a class="btn btn-info" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
+                <a class="btn btn-info edit-service" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
                 <a data-toggle="modal" :data-target="'#deleteServiceModal' + id" class="btn btn-danger"><i class="fa fa-trash"></i></a>
             </div>
         </div>
@@ -117,6 +117,11 @@
                         category: {}
                     }
                 }
+            }
+        },
+        data(){
+            return {
+                launch_tinymce : false
             }
         },
         methods: {
