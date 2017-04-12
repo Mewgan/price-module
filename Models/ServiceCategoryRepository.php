@@ -122,6 +122,11 @@ class ServiceCategoryRepository extends AppRepository
                 ->leftJoin('c.services', 's')
                 ->addOrderBy('s.position', 'ASC');
 
+            if (isset($params['websites'])) {
+                $query->leftJoin('s.website', 'sw')
+                    ->andWhere($query->expr()->in('sw.id', ':websites'));
+            }
+
             if (isset($params['options']['parent_exclude']['service_categories'])) {
                 $params['exclude_categories'] = $params['options']['parent_exclude']['service_categories'];
                 unset($params['options']['parent_exclude']['service_categories']);

@@ -34,7 +34,6 @@ class FrontServiceController extends MainController
 
             $services = (isset($data['service']) && ((string)$data['service'] == 'false' || $data['service'] === false)) ? [] : Service::repo()->listAll($params);
             $service_categories = (isset($data['category']) && ((string)$data['category'] == 'false' || $data['category'] === false)) ? [] : ServiceCategory::repo()->listAll($params);
-            
             return $this->_renderContent($content->getTemplate(), 'src/Modules/Price/Views/', compact('services', 'service_categories'));
         }
         return null;
