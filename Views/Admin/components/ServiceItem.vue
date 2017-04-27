@@ -34,13 +34,13 @@
                 </header>
             </div>
             <div class="delete-container col-md-2">
-                <a class="btn btn-info edit-service" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
+                <a @click="openAccordion" class="btn btn-info edit-service" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
                 <a data-toggle="modal" :data-target="'#deleteServiceModal' + id" class="btn btn-danger"><i class="fa fa-trash"></i></a>
             </div>
         </div>
 
         <div :id="'accordion-' + id" class="accordion collapse">
-            <div class="col-md-12">
+            <div v-if="accordion" class="col-md-12">
                 <form class="form">
                     <table class="table table-banded no-margin">
                         <tbody>
@@ -121,11 +121,14 @@
         },
         data(){
             return {
-                launch_tinymce : false
+                accordion : false
             }
         },
         methods: {
             ...mapActions(['destroy']),
+            openAccordion(){
+                this.accordion = true;
+            },
             updateContent(val) {
                 this.service.description = val;
             },
