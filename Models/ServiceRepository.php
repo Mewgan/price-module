@@ -73,7 +73,7 @@ class ServiceRepository extends AppRepository
         foreach ($data as $i => $service) {
             if (isset($service['category']['id'])) {
                 if (isset($exclude_ids[$service['category']['id']])) {
-                    unset($data[$i]['category']);
+                    unset($data[$i]);
                 }
                 if (isset($params['options']['parent_replace']['service_categories'][$service['category']['id']])) {
                     $index = findIndex($categories, 'id', $params['options']['parent_replace']['service_categories'][$service['category']['id']]);

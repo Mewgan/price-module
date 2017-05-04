@@ -185,6 +185,7 @@
                         if (response.data.status == 'success'){
                             let index = this.categories.findIndex((i) => i.id == this.category.id);
                             this.categories.splice(index, 1);
+                            this.$emit('reloadServices');
                         }
                     })
                 }
