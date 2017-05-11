@@ -95,7 +95,7 @@ class ServiceCategoryRepository extends AppRepository
             }
         }
         ksort($data);
-        return $data;
+        return array_values($data);
     }
 
     /**

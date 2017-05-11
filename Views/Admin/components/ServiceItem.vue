@@ -26,16 +26,16 @@
         <div class="list-header">
             <div class="card-head col-md-10 collapsed">
                 <header class="pl0 pr0">
-                    <i class="fa drag-arrows fa-arrows mr10"></i>
-                    <span class="text-info">Titre * : </span>
+                    <i title="Glisser et déposer pour changer l'ordre d'affichage" class="fa drag-arrows fa-arrows mr10"></i>
+                    <span class="text-primary">Titre * : </span>
                     <input type="text" class="form-control edit-service-title" v-model="service.title">
-                    <span class="text-info">Prix * : </span>
+                    <span class="text-primary">Prix * : </span>
                     <input type="text" class="form-control edit-price-title" v-model="service.price">
                 </header>
             </div>
             <div class="delete-container col-md-2">
-                <a @click="openAccordion" class="btn btn-info edit-service" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-pencil"></i></a>
-                <a data-toggle="modal" :data-target="'#deleteServiceModal' + id" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                <a @click="openAccordion" title="Ajouter une description au service" class="btn btn-default edit-service collapsed" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-angle-down"></i></a>
+                <a data-toggle="modal" title="Supprimer le service" :data-target="'#deleteServiceModal' + id" class="btn btn-default"><i class="fa fa-trash"></i></a>
             </div>
         </div>
 

@@ -86,7 +86,7 @@ class ServiceRepository extends AppRepository
                 }
             }
         }
-        return $data;
+        return array_values($data);
     }
 
     /**

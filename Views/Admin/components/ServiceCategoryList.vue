@@ -21,17 +21,17 @@
                 <ul class="list panel-group" id="price-list-sortable" data-sortable="true">
                     <li v-for="cat in categories" class="tile card panel mt10" :data-id="cat.id">
                         <div class="tile-content ink-reaction">
-                            <div class="tile-text"><i class="fa drag-arrows fa-arrows mr10"></i> {{ cat.name }}</div>
+                            <div class="tile-text"><i title="Glisser et déposer pour changer l'ordre d'affichage" class="fa drag-arrows fa-arrows mr10"></i> {{ cat.name }}</div>
                         </div>
-                        <a @click="editCategory(cat)" data-toggle="modal" data-target="#editServiceCategoryModal"
+                        <a @click="editCategory(cat)" title="Éditer la catégorie" data-toggle="modal" data-target="#editServiceCategoryModal"
                            class="btn btn-flat">
                             <i class="fa fa-pencil"></i>
                         </a>
-                        <a @click="editCategory(cat)" data-toggle="modal" data-target="#deleteServiceCategoryModal"
+                        <a @click="editCategory(cat)" title="Supprimer la catégorie" data-toggle="modal" data-target="#deleteServiceCategoryModal"
                            class="btn btn-flat ink-reaction">
                             <i class="fa fa-trash"></i>
                         </a>
-                        <a @click="selectCategory(cat)" class="btn btn-flat ink-reaction">
+                        <a @click="selectCategory(cat)" title="Afficher les tarifs de la catégorie" class="btn btn-flat ink-reaction">
                             <i class="fa fa-arrow-right"></i>
                         </a>
                     </li>
@@ -40,7 +40,7 @@
         </div><!--end .card -->
 
         <button data-toggle="modal" @click="clearCategory" data-target="#editServiceCategoryModal"
-                class="btn ink-reaction btn-raised btn-lg btn-info pull-right">
+                class="btn ink-reaction btn-raised btn-primary pull-right">
             <i class="fa fa-plus" aria-hidden="true"></i>
             Ajouter une catégorie
         </button>
