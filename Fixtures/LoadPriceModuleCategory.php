@@ -13,7 +13,6 @@ class LoadPriceModuleCategory extends AbstractFixture
         'name' => 'Price',
         'title' => 'Tarif',
         'slug' => 'price',
-        'nav' => true,
         'description' => 'Module de tarifs',
         'icon' => 'fa fa-eur',
         'author' => 'S.Sumugan',

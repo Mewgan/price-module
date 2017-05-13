@@ -3,6 +3,12 @@
 return [
 
     'app' => [
+        'Price' => [
+            'order' => 2,
+            'hook' => [
+                'left_sidebar' => true
+            ]
+        ],
         'blocks' => [
             'PriceModule' => [
                 'path' => 'src/Modules/Price/',
