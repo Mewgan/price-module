@@ -7,6 +7,12 @@ return [
             'order' => 2,
             'hook' => [
                 'left_sidebar' => true
+            ],
+            'routes' => [
+                [
+                    'title' => 'Tarif',
+                    'name'=> 'module:price',
+                ]
             ]
         ],
         'blocks' => [
