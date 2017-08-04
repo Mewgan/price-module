@@ -34,8 +34,8 @@
                 </header>
             </div>
             <div class="delete-container col-md-2">
-                <a @click="openAccordion" title="Ajouter une description au service" class="btn btn-default edit-service collapsed" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-angle-down"></i></a>
-                <a data-toggle="modal" title="Supprimer le service" :data-target="'#deleteServiceModal' + id" class="btn btn-default"><i class="fa fa-trash"></i></a>
+                <a @click="openAccordion" title="Ajouter une description au service" class="btn btn-default-bright edit-service collapsed" data-toggle="collapse" :data-parent="accordion_parent" :data-target="'#accordion-' + id"><i class="fa fa-angle-down"></i></a>
+                <a data-toggle="modal" title="Supprimer le service" :data-target="'#deleteServiceModal' + id" class="btn btn-default-bright"><i class="fa fa-trash"></i></a>
             </div>
         </div>
 

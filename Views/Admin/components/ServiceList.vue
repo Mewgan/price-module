@@ -18,7 +18,7 @@
             <div class="card-head style-primary">
                 <header>Liste des tarifs pour la catégorie : {{ category.name }}</header>
                 <div v-show="category.id != null" class="tools">
-                    <a @click="save" class="btn btn-default"><i class="fa fa-save"></i> Enregistrer</a>
+                    <a @click="save" class="btn btn-default-bright"><i class="fa fa-save"></i> Enregistrer</a>
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
                     </ul>
                     <em class="text-caption pull-left mt10">(*) Champs obligatoires</em>
                     <button data-toggle="modal" @click="addService"
-                            class="btn ink-reaction btn-raised btn-primary pull-right">
+                            class="btn btn-primary pull-right">
                         <i class="fa fa-plus" aria-hidden="true"></i>
                         Ajouter un tarif
                     </button>

@@ -14,7 +14,7 @@
             <div class="card-head style-primary">
                 <header><i class="fa fa-fw fa-tag"></i> Catégories</header>
                 <div v-show="categories.length > 0" class="tools">
-                    <a @click="updatePosition" class="btn btn-default"><i class="fa fa-save"></i> Enregistrer</a>
+                    <a @click="updatePosition" class="btn btn-default-bright"><i class="fa fa-save"></i> Enregistrer</a>
                 </div>
             </div>
             <div class="list-results list-results-underlined">
@@ -40,7 +40,7 @@
         </div><!--end .card -->
 
         <button data-toggle="modal" @click="clearCategory" data-target="#editServiceCategoryModal"
-                class="btn ink-reaction btn-raised btn-primary pull-right">
+                class="btn btn-primary pull-right">
             <i class="fa fa-plus" aria-hidden="true"></i>
             Ajouter une catégorie
         </button>

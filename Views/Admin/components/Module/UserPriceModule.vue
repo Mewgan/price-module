@@ -1,7 +1,7 @@
 <template>
     <router-link
             :to="{name: 'module:' + content.module.category.slug, params: {website_id: website}}"
-            class="btn ink-reaction btn-info">Modifier
+            class="btn ink-reaction btn-default-bright">Modifier
     </router-link>
 </template>
 
